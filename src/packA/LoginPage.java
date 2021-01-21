@@ -27,13 +27,17 @@ import javax.swing.border.EmptyBorder;
  *
  * @author ubaid
  */
-public class LoginPage extends JFrame {
+public class LoginPage extends JFrame implements Verify {
 
-    private JTextField username_field;
+    static JTextField username_field;
     private JPasswordField password_field;
     private JPanel content_pane;
     private JButton btn_submit;
     private JButton btn_to_register_page;
+    List list;
+    
+    SenderPage sender_page;
+    ReceiverPage receiver_page;
 
     LoginPage() {
         setTitle("Login Page");
@@ -51,9 +55,9 @@ public class LoginPage extends JFrame {
         lbl_title.setBounds(425, 15, 275, 90);
         content_pane.add(lbl_title);
 
-        username_field = new JTextField();
-        username_field.setFont(new Font("Arial", Font.PLAIN, 32));
-        username_field.setBounds(480, 200, 280, 60);
+        this.username_field = new JTextField();
+        this.username_field.setFont(new Font("Arial", Font.PLAIN, 32));
+        this.username_field.setBounds(480, 200, 280, 60);
         content_pane.add(username_field);
 
         password_field = new JPasswordField();
@@ -74,30 +78,23 @@ public class LoginPage extends JFrame {
         btn_submit = new JButton("Submit");
         btn_submit.setFont(new Font("Arial", Font.PLAIN, 24));
         btn_submit.setBounds(565,
-                 425, 190, 50);
+                425, 190, 50);
         btn_submit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 try {
                     String username = username_field.getText();
                     String password = new String(password_field.getPassword());
-                    
+
                     User user = new User();
-                    List list = user.login(username, password);
-                    for (int i = 0; i < list.size(); i++) {
-                        System.out.println(list.get(i));
+                    list = user.login(username, password);
+
+                    if (list.size() > 1) {
+                        verified();
+                    } else {
+                        notVerified();
                     }
-                    dispose();
-                    
-                    String role = (String) list.get(2);
-                    if ("sender".equals(role)) {
-                        SenderPage sender_page = new SenderPage();
-                        sender_page.setVisible(true);
-                    } else if ("receiver".equals(role)) {
-                        ReceiverPage receiver_page = new ReceiverPage();
-                        receiver_page.setVisible(true);
-                    }
-                    
+
                 } catch (ClassNotFoundException | SQLException ex) {
                     Logger.getLogger(LoginPage.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -130,6 +127,34 @@ public class LoginPage extends JFrame {
         };
 
         EventQueue.invokeLater(runnable);
+    }
+
+    @Override
+    public void verified() {
+        dispose();
+        String role = (String) list.get(2);
+        if ("sender".equals(role)) {
+            sender_page = new SenderPage();
+            sender_page.setVisible(true);
+            
+//            sender_page.username_field.setText(this.username_field.getText());
+        } else if ("receiver".equals(role)) {
+            receiver_page = new ReceiverPage();
+            receiver_page.setVisible(true);
+            
+//            receiver_page.username_field.setText(this.username_field.getText());
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
+        }
+    }
+
+    @Override
+    public void notVerified() {
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
+        }
     }
 
 }

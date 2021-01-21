@@ -10,6 +10,9 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -17,13 +20,44 @@ import java.sql.PreparedStatement;
  */
 public class User extends Account{
 
-    private String codename;;
-    private String fullname;
+    
+    private static String fullname;
+
+    public static String getFullname() {
+        return fullname;
+    }
+
+    public static void setFullname(String fullname) {
+        User.fullname = fullname;
+    }
     
     @Override
-    void register(String fullname, String email, String username, String password, String role) {
+    public List login(String username, String password) throws ClassNotFoundException, SQLException {
+        Config config = new Config();
+        ResultSet query = config.read("SELECT username, password, role_name, email, fullname "
+                + "FROM account WHERE "
+                + "username = \"" + username
+                + "\" and password = \"" + password + "\""
+        );
+
+        List list = new ArrayList();
+        if (query.next()) {
+            list.add(query.getString(1));
+            list.add(query.getString(2));
+            list.add(query.getString(3));
+            list.add(query.getString(4));
+            list.add(query.getString(5));
+        } else {
+            list.add("username or password is wrong");
+        }
+        return list;
+    }
+    
+    
+    
+    @Override
+    public void register(String fullname, String email, String username, String password, String role) {
         this.fullname = fullname;
-        this.codename = "sdr_" + username;
         try {
             Config config = new Config();
             String sql = "INSERT INTO account VALUES (NULL, ?, ?, ?, ?, ?, NULL)";
