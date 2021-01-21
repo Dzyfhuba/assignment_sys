@@ -6,13 +6,31 @@
 
 package packA;
 
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+
 /**
  *
  * @author ubaid
  */
-public class ReceiverPage {
+public class ReceiverPage extends JFrame{
+    
+    ReceiverPage() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Receiver Page");
+        setBounds(10, 10, 1000, 600);
+        setResizable(false);
+    }
+    
     public static void main(String[] args) {
-        // TODO code application logic here
+        Runnable runnable = new Runnable() {
+            public void run() {
+                RegisterPage f = new RegisterPage();
+                f.setVisible(true);
+            }
+        };
+        
+        EventQueue.invokeLater(runnable);
     }
 
 }

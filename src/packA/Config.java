@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
 
 /**
  *
@@ -28,11 +29,21 @@ public class Config {
                 "jdbc:mysql://localhost:1111/assignment_sys_db",
                 "root",
                 "plmoknijb");
-        this.stmt = con.createStatement();
-
+        this.stmt = this.con.createStatement();
+    }
+    
+    Connection conn(){
+        return this.con;
     }
 
-    ResultSet setQuery(String query) throws SQLException {
-        return stmt.executeQuery(query);
+    ResultSet read(String query) throws SQLException {
+        return this.stmt.executeQuery(query);
+    }
+    
+    void create(PreparedStatement statement) throws SQLException {
+        int rowInserted = statement.executeUpdate();
+        if (rowInserted > 0) {
+            System.out.println("A new user was inserted successfully!!");
+        }
     }
 }
