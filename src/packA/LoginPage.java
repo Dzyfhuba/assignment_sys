@@ -134,15 +134,27 @@ public class LoginPage extends JFrame implements Verify {
         dispose();
         String role = (String) list.get(2);
         if ("sender".equals(role)) {
-            sender_page = new SenderPage();
-            sender_page.setVisible(true);
-            
+            try {
+                sender_page = new SenderPage();
+                sender_page.setVisible(true);
+                
 //            sender_page.username_field.setText(this.username_field.getText());
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(LoginPage.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginPage.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else if ("receiver".equals(role)) {
-            receiver_page = new ReceiverPage();
-            receiver_page.setVisible(true);
-            
+            try {
+                receiver_page = new ReceiverPage();
+                receiver_page.setVisible(true);
+                
 //            receiver_page.username_field.setText(this.username_field.getText());
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(LoginPage.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginPage.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         for (int i = 0; i < list.size(); i++) {

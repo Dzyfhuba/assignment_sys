@@ -56,7 +56,7 @@ public class SenderPage extends JFrame implements ActionListener {
         config = new Config();
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Receiver Page");
+        setTitle("Sender Page");
         setBounds(10, 10, 1000, 600);
         setResizable(false);
         content_pane = new JPanel();
