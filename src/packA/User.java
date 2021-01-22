@@ -53,8 +53,6 @@ public class User extends Account{
         return list;
     }
     
-    
-    
     @Override
     public void register(String fullname, String email, String username, String password, String role) {
         this.fullname = fullname;

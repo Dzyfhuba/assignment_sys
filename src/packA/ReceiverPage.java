@@ -41,6 +41,8 @@ public class ReceiverPage extends JFrame{
         lbl_title.setFont(new Font("Times New Roman", Font.PLAIN, 46));
         lbl_title.setBounds(425, 15, 275, 90);
         content_pane.add(lbl_title);
+        
+        
     }
     
     public static void main(String[] args) {

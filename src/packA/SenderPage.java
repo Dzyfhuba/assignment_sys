@@ -28,8 +28,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicBorders;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 
 /**
  *
@@ -45,8 +49,12 @@ public class SenderPage extends JFrame implements ActionListener {
     JButton btn_browse_file;
     JTextArea path_list;
     String the_list = "";
-
-    SenderPage() {
+    
+    Config config;
+    
+    SenderPage() throws ClassNotFoundException, SQLException {
+        config = new Config();
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Receiver Page");
         setBounds(10, 10, 1000, 600);
@@ -95,6 +103,18 @@ public class SenderPage extends JFrame implements ActionListener {
             }
         });
         content_pane.add(btn_add_to_list);
+        
+        JButton btn_clear = new JButton("Clear");
+        btn_clear.setBounds(800, 300, 100, 50);
+        btn_clear.setFont(new Font("Arial", Font.PLAIN, 24));
+        btn_clear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                the_list = "";
+                path_list.setText("");
+            }
+        });
+        content_pane.add(btn_clear);
 
         JButton btn_send = new JButton("Send");
         btn_send.setBounds(700, 450, 100, 50);
@@ -113,7 +133,7 @@ public class SenderPage extends JFrame implements ActionListener {
                         f[i] = new File(file_list[i]);
                         System.out.println(f[i].getName());
                         upload(f[i]);
-                    } catch (IOException ex) {
+                    } catch (IOException | SQLException ex) {
                         Logger.getLogger(SenderPage.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -125,12 +145,43 @@ public class SenderPage extends JFrame implements ActionListener {
 
     }
 
-    void upload(File source) throws IOException {
+    void upload(File source) throws IOException, SQLException {
         String storage = "storage/";
         File dest = new File(storage+ username_field.getText() + "_" + source.getName());
         
         Files.copy(source.toPath(), dest.toPath());
         System.out.println(source.getPath() + " uploaded");
+        
+        String sql = "SELECT username, email, fullname FROM account "
+                + "WHERE username = \"" + username_field.getText() + "\"";
+        Statement statement = config.conn().createStatement();
+        ResultSet result = statement.executeQuery(sql);
+        
+        int count = 0;
+        
+        String username = "";
+        String email = "";
+        String fullname = "";
+        String filename = storage + username_field.getText() + "_" + source.getName();
+        
+        while (result.next()) {
+            username += result.getString(1);
+            email += result.getString(2);
+            fullname += result.getString(3);
+        }
+        
+        String sql2 = "INSERT INTO storage VALUES (NULL, ?, ?, ?, NULL)";
+        PreparedStatement statement2 = config.conn().prepareStatement(sql2);
+        statement2.setString(1, fullname);
+        statement2.setString(2, username);
+        statement2.setString(3, filename);
+        
+        int rowInserted = statement2.executeUpdate();
+        if (rowInserted > 0) {
+            System.out.println("insert into storage success");
+        }
+        the_list = "";
+        path_list.setText("");
     }
 
     @Override
@@ -156,8 +207,14 @@ public class SenderPage extends JFrame implements ActionListener {
     public static void main(String[] args) {
         Runnable runnable = new Runnable() {
             public void run() {
-                SenderPage f = new SenderPage();
-                f.setVisible(true);
+                try {
+                    SenderPage f = new SenderPage();
+                    f.setVisible(true);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(SenderPage.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                    Logger.getLogger(SenderPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         };
 
