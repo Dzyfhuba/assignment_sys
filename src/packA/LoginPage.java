@@ -34,7 +34,7 @@ public class LoginPage extends JFrame implements Verify {
     private JPanel content_pane;
     private JButton btn_submit;
     private JButton btn_to_register_page;
-    List list;
+    static List list;
     
     SenderPage sender_page;
     ReceiverPage receiver_page;
